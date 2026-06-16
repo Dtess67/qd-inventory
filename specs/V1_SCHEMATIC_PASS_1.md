@@ -52,14 +52,14 @@ Key invariant (from power-safety pass): **the E-stop cuts the motor rail, NOT th
 | XT60 interconnect | HAVE/CONFIRM | pack V | 60A rated, far above draw | Source -> fuse | XT60H solder-cup, fill for 22AWG | Keyed; can't reverse at connector | Q1: count pairs |
 | Inline blade fuse + holder | HAVE | pack V | Protects WIRING, not silicon | After XT60 | ~16AWG holder leads, bracket to 22AWG bus | 5A or 7.5A only; never 15A+ (melts small wire) | **Fuse rating: 5A vs 7.5A** |
 | Main rocker switch (KCD1) | HAVE | pack V | ~6A rated | After fuse | spade pigtails | Fuse UPSTREAM of switch (correct) | D1: placement (not in CAD) |
-| Reverse-polarity protector | BUY | 4-60V | >=10A, prefer 20-25A | After switch, before bus branch | inline, 22AWG+ | Protects whole bus from reversed pack | Exact Pololu part |
+| Reverse-polarity protector | ORDERED (Pololu #5387) | 4-60V | 25A continuous (~50A few sec) | After switch, before bus branch | inline, 22AWG+ | Protects whole bus from reversed pack. NON-BLOCKING version: lets motor regen current flow back to the pack as the big sink. Do NOT substitute ideal-diode #5388 (would block regen, push spike onto motor rail). | resolved |
 | Soft-start / inrush block | DECIDE/BUY | pack V | limits inrush into buck caps | Same node as reverse protector | inline | Prevents contact pitting / nuisance fuse blow | Integral to protector datasheet, or separate part |
 | Protected raw bus | (node) | ~11.1V | sum of all branches | Distribution point | soldered/Perma-Proto | Everything downstream is now protected | — |
 | Pololu D24V22F5 buck | HAVE | in 11.1V -> out 5V | 2.5A out; Pi ~0.7-1A + LED band | Bus -> 5V rail | inline, decoupled | Holds 5V across full discharge (no brownout) | 5V rail budget (F13) |
 | TB6612FNG driver | HAVE | VMOT to 13.5V (>12.6V OK) | 1.2A cont / 3.2A peak per ch; stall 0.9A OK | Motor rail -> motors | needs PWM x2, dir x4, STBY | STBY pin = a software stop path (distinct from E-stop) | — |
 | Motor-only E-stop | DECIDE/BUY | motor rail V | full motor current | Between bus and VMOT | switch/relay rated > stall | Cuts motors, leaves Pi alive | **E-stop part + placement** |
 | ADS1115 + divider | HAVE | reads scaled pack V | uA | Bus -> ADC | STEMMA QT / header | Enables software LVC + graceful-shutdown trigger (telemetry, not safety) | divider ratio |
-| LiPo low-voltage alarm | BUY | 1-8S | uA | Balance lead | balance connector | Independent always-on scream-box; needs no brain | get x2-3 |
+| LiPo low-voltage alarm | ORDERED (Apex #1655, 4 units) | 1-8S | uA | Balance lead | balance connector | Independent always-on scream-box; needs no brain | resolved |
 | Hardware load-disconnect | DECIDE->BUY | 3S | > stall current | Guards raw bus | inline discharge path | The REAL hardware LVC; cuts power without the Pi | **Finished-pack inline cutoff - NOT a cell-building BMS** |
 | Pi hold-up / UPS | DECIDE->BUY | 5V | holds Pi ~seconds | On 5V rail | board-dependent | Graceful shutdown window (F14) | **Pi-3 mechanical fit-check first** |
 | Bulk caps (electrolytic) | HAVE | rail V | absorb spikes | TB6612 VMOT, buck IN, buck OUT, local | soldered close to pins | Designed in, not bolted on after noise appears | verify on Hantek |
@@ -110,7 +110,7 @@ Key invariant (from power-safety pass): **the E-stop cuts the motor rail, NOT th
 
 - **Pi Global Shutter Camera (HAVE):** CSI ribbon (15-pin, 24in flex) -> Pi. Global shutter deliberate (moving robot, no rolling-shutter jello). Fragile flex - route, don't pinch.
 - **VL53L4CD ToF x2 (HAVE):** both fixed addr 0x29 -> MUST sit on separate PCA9548 mux channels. Ridge-mounted, flank camera (forward distance).
-- **Downward floor/cliff sensing (REQUIRED):** V1 MUST have downward sensing for cliff/edge detection before any rolling movement — this is a hard requirement, not optional. The 37-in-1 IR reflectance part is a **candidate only**, provisional until bench-confirmed or replaced with a better part. The requirement is locked; the specific sensor is not. Open decision: confirm-or-replace the part, and define mounting (front-lower zone). Build-blocking for safe motion.
+- **Downward floor/cliff sensing (REQUIRED — RESOLVED):** V1 MUST have downward sensing for cliff/edge detection before any rolling movement. **Resolved to 2x VL53L4CD downward ToF (Pololu #3692, ORDERED)** — front-left + front-right underside, each on its own PCA9548 mux channel (same address-collision handling as the forward ToF; all VL53 default to 0x29). ToF measures absolute distance independent of surface color/texture, so carpet-vs-tile is solved (the reason it beats reflectance IR). A 6-inch drop reads as a clean distance jump. The 37-in-1 IR reflectance part is now **bench-only backup, NOT trusted V1 fall protection** (surface-dependent). Ultra-low-power interrupt mode (<100uA) suits a reflex "is the floor still there" trigger. Build-blocking requirement now satisfied by ordered hardware.
 - **PCA9548 mux x2 (HAVE):** resolves ToF collision; also isolates any other 0x68/0x29 colliders.
 - **Qwiic/STEMMA 5-port hub (HAVE):** fan-out for unique-address devices (use hub for unique addrs, mux for colliders).
 - **BNO085 IMU (HAVE):** tilt/tip detection (F2). **Known I2C clock-stretch trouble on Pi -> run UART-RVC or SPI**, or budget I2C bring-up time. Do not assume plain I2C works.
@@ -130,7 +130,7 @@ No final numeric thresholds. Each event tagged by where it lives.
 | E-stop (motor cut) | **Hardware only** | Cuts motor rail; Pi stays alive |
 | Lost link | Pi software (-> KB2040 later) | Comms watchdog -> safe stop |
 | Tilt threshold | Pi software now; **KB2040 intended** | From BNO085; reflex-grade later |
-| Floor absence / cliff | **KB2040 intended**, Pi-readable day one | From downward sensor; build-blocking for motion |
+| Floor absence / cliff | **2x VL53L4CD downward ToF (ORDERED)**; Pi-readable day one, KB2040-reflex later | Build-blocking requirement now met by hardware; 37-in-1 IR is bench backup only |
 | Low voltage | Layered: hardware load-disconnect + Pi software (ADS1115) + balance alarm | Hardware is the real cutoff; software is graceful; alarm is audible |
 | Motor command timeout | Pi software now; **KB2040 intended** | Dead-man on motion commands |
 | Motor rail fault | Hardware (fuse) + future refinement | Over-current -> fuse; finer sensing later |
@@ -147,7 +147,7 @@ Reflex layer (sub-100ms) is *intended* for KB2040; day one these run on the Pi a
 - **Pi / service hatch** - top-shell hatch for Pi, SD access, and a heat path (F15: Pi 3 runs warm; needs airflow/vent).
 - **Power distribution zone** - protected-bus node, buck, caps, reverse/inrush block grouped; short fat power runs.
 - **Motor / wheel zones** - 2 drive wheels + caster; caster shim height vs axle for a level deck (F2). Wheel size vs 72mm body open (D2).
-- **Front lower floor-sensor zone** - downward cliff sensor with clear line to the floor.
+- **Front lower floor-sensor zone (CLIFF BAY — concrete):** a two-port downward-ToF cliff bay. Two VL53L4CD sensors at **front-left + front-right underside**, each with a **clear downward optical port** (small opening or IR-transparent window — ToF cannot range through opaque shell). **Rigid, fixed-height mounting** (a wobbling sensor gives noisy distance; the fixed bay height sets the floor-distance baseline against which a drop reads as a sudden increase). **Recessed/protected** so the sensors don't scrape on lips or carpet. **Serviceable STEMMA/Qwiic wiring path** from each ToF to the PCA9548 mux. Sensors sit near the leading edge so QD sees the drop before a wheel crosses it.
 - **Front ridge zone** - camera centered, ToF flanking; ridge is directional, not a face.
 - **Body-to-ridge cable path** - protected route for the 6-wire JST-XH (and flex-rated for v1.5 articulation).
 - **E-stop physical access** - reachable, unambiguous; cuts motors only.
@@ -159,11 +159,11 @@ Reflex layer (sub-100ms) is *intended* for KB2040; day one these run on the Pi a
 ## 9. Open decisions before CAD (ranked by build-blocking priority)
 
 1. **Compute topology - CONFIRMED (D3).** Reserve KB2040 space + connectors; run Pi-only day one; intend Pi+KB2040 for the final reflex architecture. Decided. (Remaining layout work: route encoder/reflex signals so either consumer works.)
-2. **Downward floor/cliff sensor - choice + mounting.** Build-blocking for *any* safe rolling movement. Confirm-or-replace the candidate part, define the front-lower zone.
+2. **Downward floor/cliff sensor - RESOLVED.** 2x VL53L4CD downward ToF ordered (Pololu #3692). Remaining: define the two-port cliff bay geometry in CAD (see section 8).
 3. **Hardware load-disconnect - finished-pack inline cutoff.** Pin the exact part (NOT a cell-building BMS). Shapes the protected-bus node.
 4. **Fuse rating - 5A vs 7.5A.** Quick but real; sizes the protection.
 5. **E-stop part + placement.** Motor-only cut; needs a physical home.
-6. **Reverse-protection part.** Exact Pololu ideal-diode unit.
+6. **Reverse-protection part - RESOLVED.** Pololu #5387 non-blocking 25A ordered (NOT ideal-diode #5388).
 7. **Inrush / soft-start handling.** Integral to the protector, or a separate block.
 8. **Pi hold-up / UPS candidate.** After Pi-3 mechanical fit-check.
 9. **Body-to-ridge connector / topology (D6).** 6-wire JST-XH confirmed vs mux-in-ridge 4-wire.
