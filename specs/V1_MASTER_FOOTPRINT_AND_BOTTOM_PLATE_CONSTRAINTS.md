@@ -1,6 +1,8 @@
 # V1_MASTER_FOOTPRINT_AND_BOTTOM_PLATE_CONSTRAINTS
 
-> **v1.1 amendment (this revision).** This amendment sharpens `60810ce`. It does not replace it. The datum, axis convention, envelope, wheel truth, lookahead rule, and cliff-bay architecture locked in `60810ce` are unchanged. v1.1 adds one datum, reservations and held items, a safety non-claim, one promoted OPEN DECISION, and several gated measurements. Every new or reclassified item is tagged **(v1.1)** so the diff against `60810ce` is legible. Audited by Q, ratified by Darrell.
+> **v1.2 amendment (this revision).** This revision demotes the body envelope from locked constraint to **provisional target**, **kills the 72 mm shell cap** (replaced by a derived height ≈90 mm, A1.1), **locks the motor mount as a printed cradle** (B6 #12 closed), and adds the **governing design hierarchy**. It supersedes v1.1 on every point of conflict and preserves everything else byte-for-byte. Items tagged **(v1.2)**. Decided by Darrell + Q (hierarchy + provisional-envelope language) and Claude (height derivation); ratified by Darrell.
+>
+> **v1.1 amendment.** This amendment sharpens `60810ce`. It does not replace it. The datum, axis convention, envelope, wheel truth, lookahead rule, and cliff-bay architecture locked in `60810ce` are unchanged. v1.1 adds one datum, reservations and held items, a safety non-claim, one promoted OPEN DECISION, and several gated measurements. Every new or reclassified item is tagged **(v1.1)** so the diff against `60810ce` is legible. Audited by Q, ratified by Darrell.
 
 The shared datum every shell module references. **The wheel chooses the floor relationship; the floor relationship chooses the sensor geometry; the sensor geometry chooses the front underside. Only then does the pill become honest.** (Q)
 
@@ -10,12 +12,30 @@ The shared datum every shell module references. **The wheel chooses the floor re
 
 ---
 
+## Governing design hierarchy (v1.2)
+
+Ratified order of precedence. Every dimension and every fork in this doc is judged against this list, top down:
+1. **Meets physics and safety requirements.**
+2. **Easy to work on.**
+3. **Easy to assemble.**
+4. **Easy to access and service.**
+5. **Durable enough for staged testing.**
+6. **Looks good — only after 1-5 survive.**
+
+**Provisional-envelope rule (Q):** *All body dimensions are provisional envelope targets until validated against physics, serviceability, wiring clearance, thermal behavior, and assembly access. If those requirements conflict with the aesthetic envelope, the envelope yields.*
+
+**Receipt rule (v1.2):** when the envelope yields, the doc records *what it yielded to and by how much* (e.g. "height 72 -> ~90 mm to seat the Pi stack above the deck"). Provisional never means untracked. Every grown dimension carries its reason, so no number is ever again inherited without a source.
+
+**Design rule:** compact where possible, accessible where necessary, safe always, pretty last. Draw ugly if ugly tells the truth.
+
 ## Settled inputs this doc is built on
 
 | Decision | Value | Source |
 |---|---|---|
 | D2 wheels | **Pololu 80mm**, protrude through side cutouts | Darrell ratified (function over form; keyed hub keeps encoders honest) |
-| Real envelope | **180 x 200 x 72 mm** body; wheels exceed 72mm height (F2) so they bulge past the sides | Q + chassis lock |
+| Envelope status **(v1.2)** | **Provisional targets, not constraints.** 180 x 200 = footprint targets; height is **derived ~90 mm** (was 72 — killed, see A1.1). Envelope yields to physics/serviceability. | Darrell hierarchy + Q provisional rule |
+| Motor mount **(v1.2)** | **Printed cradle** (Pololu #2676 bracket not in BOM; cradle prints in-house, tunable standoff, integrates encoder/wire/hub). | Darrell ratified |
+| Derived height **(v1.2)** | Deck top **~57 mm**, ground clearance **27.5 mm**, shell **~90 mm** (soft above deck pending Pi-stack + shell-thickness measure). | Claude derivation |
 | V1 crawl speed | **0.05 - 0.10 m/s** (assumption baked into safety geometry) | Q |
 | Cliff lookahead | sensor detection point **>= 50 mm ahead of wheel commitment** | Q (closes Claude falsifier #1) |
 | Cliff bay | **3 pockets; L + R populated, center reserved/blanked** | Q + Claude (closes falsifier #2) |
@@ -28,11 +48,27 @@ The shared datum every shell module references. **The wheel chooses the floor re
 ## PART A — Master footprint and datums
 
 ### A1. The envelope
-- Body: **180 mm wide x 200 mm long x 72 mm tall**, tapered pill.
+- Body: **180 mm wide x 200 mm long**, tapered pill. **Height is derived, not capped (v1.2)** — see the Z-stack in A1.1; the old 72 mm figure is dead.
 - Orientation convention (LOCKED, Q-confirmed against chassis lock — NOT flipped): **+X = forward** (direction of travel / nose), **+Y = left**, **+Z = up**. Origin at `DRIVE_AXLE_FLOOR_DATUM` (A2).
-- **Axis assignment (LOCKED):** 200 mm = travel / fore-aft / **X** length; 180 mm = width / **Y** span; 72 mm = vertical / **Z** max shell height.
-- **Axis ranges:** X roughly -rear to +front across 200 mm; Y roughly -90 mm to +90 mm across 180 mm; Z floor upward to 72 mm shell height — **with 80 mm wheels protruding beyond the shell envelope** (the wheels exceed the 72 mm shell logic and are real-envelope truth, not contained by it).
-- Wheels protrude past the 180 mm width through side cutouts. The **real envelope** including wheels is wider than 180 mm — CAD must reserve clearance for the bulge so the side cutouts don't fight the outer profile.
+- **Axis assignment (convention LOCKED; magnitudes provisional, v1.2):** travel / fore-aft = **X** (target 200 mm); width = **Y** (target 180 mm); vertical = **Z** (**derived ~90 mm shell height — the 72 mm cap is killed; see A1.1**). The axis *convention* is locked; the *magnitudes* are provisional envelope targets that yield to physics/serviceability per the hierarchy.
+- **Axis ranges:** X roughly -rear to +front across ~200 mm; Y roughly -90 mm to +90 mm across ~180 mm; Z floor upward to **~90 mm derived shell height**. The **80 mm wheels protrude through the side cutouts** as real-envelope truth.
+- Wheels protrude past the 180 mm width through side cutouts. The **real envelope** including wheels is wider than 180 mm — CAD must reserve clearance for the bulge so the side cutouts don't fight the outer profile. **(v1.2)** With the shell now at ~90 mm, the wheel top (80 mm) sits **below** the shell top — wheels no longer stand proud of the **top**, only past the **sides**. The old "wheels exceed shell height" note was a 72 mm artifact and is retired.
+
+### A1.1 Derived height — the Z-stack (v1.2)
+The 72 mm cap was an inherited number with no first-principles owner. Tested against the build it proved an **under-spec** — it could not seat a Pi above the deck in the serviceable motor-under-solid-deck topology. Per the hierarchy, the envelope yielded and height is now **derived bottom-up from the floor**:
+
+| Z (mm) | Plane | Status |
+|---|---|---|
+| 0 | floor / datum | LOCKED |
+| 27.5 | motor belly (lowest point) -> **ground clearance 27.5 mm** | derived (Ø25 motor on axle) |
+| 40 | drive axle | LOCKED (wheel radius) |
+| 52.5 | motor top | derived |
+| ~57 | **deck top — solid plate** | derived (motor top + cradle wall + ~4 mm plate) |
+| 57 -> ~87 | cabin: Pi 3 stack + wire bend radius + thermal gap (~30 mm) | **soft** — pending measure |
+| ~90 | **derived shell top** | **soft** — firms on the two measures below |
+| >90 | ridge reach reserved (v1.5 camera tilt) | reserved |
+
+**Two measured inputs firm ~90 into exact:** (1) Pi 3 stack height as installed (standoffs + board + tallest component / any HAT); (2) chosen top-shell wall thickness. Everything from the deck **down** (0 -> 57) is already hard off the motor + cradle geometry. The new provisional cap = this derived minimum + margin, and it carries its receipt (A1.1) instead of being inherited.
 
 ### A2. The master datum (origin) — `DRIVE_AXLE_FLOOR_DATUM`
 - **Datum name: `DRIVE_AXLE_FLOOR_DATUM`** (Q-required naming). NOT "center datum" — that would be confusable with the geometric center of the pill, which this is NOT. The datum is where motion meets the floor, not the centroid of the shell.
@@ -44,7 +80,7 @@ The shared datum every shell module references. **The wheel chooses the floor re
 - Two drive wheels, 80mm dia, on a common axle line perpendicular to travel.
 - **Wheelbase axis = the master datum Y-axis** (the wheels straddle the origin, one at +Y, one at -Y).
 - Wheel track (center-to-center across the body): OPEN — set by motor mount width + wheel hub width; must keep the 80mm wheels clearing the internal frame while protruding through the side cutouts. CAD sizes this first because it sets how far the cutouts sit.
-- Deck height above floor = wheel radius (40mm) minus how much axle sits below deck — drives the caster shim (A5). OPEN until motor mount is placed. **(v1.1)** The "how much axle sits below deck" term is NOT pure arithmetic — it is set by the **motor-mount method**, now tracked as an OPEN DECISION (B6). Deck Z cannot be computed until that fork is decided.
+- Deck height above floor = wheel radius (40mm) minus how much axle sits below deck — drives the caster shim (A5). **(v1.1)** The "how much axle sits below deck" term is NOT pure arithmetic — it is set by the **motor-mount method**. **(v1.2) RESOLVED:** motor mount = **printed cradle** (B6 #12 closed). The cradle seats the motor under a solid, uncut plate (serviceability-first per the hierarchy), giving **deck top ~57 mm** (motor top 52.5 + cradle wall + ~4 mm plate) and **ground clearance 27.5 mm** at the motor belly. Deck Z is now hard, and the caster shim (A5) is computable.
 
 ### A4. The cliff-lookahead constraint (safety geometry — V1-conditional, non-negotiable within its regime)
 - The downward cliff sensors sit FORWARD of the wheels by a distance set by stopping distance.
@@ -56,7 +92,7 @@ The shared datum every shell module references. **The wheel chooses the floor re
 ### A5. The caster (rear) and deck level
 - Single ball caster, rear underside, on the travel centerline behind the wheel line.
 - Rear placement is deliberate: it puts the cliff sensors + wheels forward, so the sensors get the earliest view of a drop before the wheels commit (the geometry enforces "look before you leap").
-- Caster height must match the wheel-defined deck height so the deck sits **level** (F2). Caster shim = (wheel-set deck height) - (caster natural height). OPEN until wheel mount height is set. **(v1.1)** Because deck height is now gated by the motor-mount decision (A3, B6), the caster shim is downstream of that same fork: motor-mount method -> axle Z confirm -> deck Z -> caster shim.
+- Caster height must match the wheel-defined deck height so the deck sits **level** (F2). Caster shim = (wheel-set deck height) - (caster natural height). **(v1.1)** gated by the motor-mount decision. **(v1.2) RESOLVED enough to compute:** deck top is now ~57 mm (A3, cradle locked), and the #2692 caster uses a **1″ (25.4 mm) ball**. The shim holds the rear contact at the deck plane so she sits level; exact shim = (rear deck-to-floor geometry) − (caster natural height incl. the 25.4 mm ball) — a clean measure at the rear layout, no longer a blocked fork.
 - A non-level deck tilts every sensor reference, including the cliff baseline — so this is a safety-adjacent dimension, not just cosmetics.
 
 ### A6. Center of gravity
@@ -104,6 +140,7 @@ The bottom plate is the **rigid safety datum**: the part that carries the calibr
 - Wiring: serviceable STEMMA/Qwiic path from each pocket to the PCA9548 mux. Route protected, not pinched by the nose swap.
 - **(v1.1) SAFETY NON-CLAIM (Q-required, explicit):** two downward VL53L4CD sensors are **narrow path probes, not full-width front-edge proof.** They protect the left/right wheel-commitment paths only. A drop located in the center blind strip between the L and R cones is **not** guaranteed to be seen at V1. The reserved center pocket exists precisely because full front-edge cliff coverage is **not claimed** until it is bench-tested. CAD and behavior code must not assume edge-to-edge floor sensing.
 - **(v1.1) Cliff vertical geometry is a measurable, not a given.** A correct forward X coordinate with a bad recessed tunnel can still make the sensor lie. The following are COMPUTE/MEASURE items (B6), each sized against the cone-clearance rule (A7): downward-ToF floor baseline height, optical-port recess depth, and front-lip clearance angle.
+- **(v1.2) Sensor-capability clarifier (Q):** the VL53L4CD ToF **reduces dependence on surface reflectance compared with simple IR reflectance sensors, but tile/carpet/drop-off behavior must still be bench-validated.** No "reflectance solved" claim is made anywhere; real-world edge cases (dark or shiny materials, oblique angles, sensor saturation, recess/tunnel interference) remain live until tested, and are governed by the cone-clearance rule (A7) and the bench-validation triggers (A4, B3).
 
 ### B4. Fastener + frame interface (OPEN DECISION — see B6)
 - Pi mounts M2.5 (Geekworm), chassis mounts M3 (ruthex) — two fastener systems coexist (F7/D4). Bottom plate uses M3 heat-set inserts for the chassis; Pi standoff method is a Part-C (core frame) concern but the plate must reserve its footprint.
@@ -116,11 +153,11 @@ The bottom plate is the **rigid safety datum**: the part that carries the calibr
 
 ### B6. What stays OPEN after this doc (gates remaining before CAD-final)
 
-Q's check caught a real error in the draft: items filed as arithmetic that are actually design decisions. Corrected split below. **(v1.1)** adds one OPEN DECISION (motor-mount method), gates deck height under it, and adds the wire-channel and cliff-vertical measurables to COMPUTE.
+Q's check caught a real error in the draft: items filed as arithmetic that are actually design decisions. Corrected split below. **(v1.1)** adds one OPEN DECISION (motor-mount method), gates deck height under it, and adds the wire-channel and cliff-vertical measurables to COMPUTE. **(v1.2)** closes #12 (motor mount = printed cradle) and resolves deck height in #2; the OPEN DECISIONS still standing are **D4 fastener (#9), fuse rating (#10), and E-stop (#11)**.
 
 **OPEN COMPUTE — pure numbers, derivable from chosen/measured parts or first prints:**
 1. Wheel track width (A3) — sets cutout position.
-2. Deck height + caster shim (A5) — sets level deck. **(v1.1) GATED by OPEN DECISION #8 (motor-mount method); not computable until that fork closes.**
+2. Deck height + caster shim (A5). **(v1.2) DECK HEIGHT RESOLVED -> deck top ~57 mm** (cradle locked, #12 closed; corrects v1.1's stray "#8" reference). Caster shim remains a measure at the rear layout, now computable against the 25.4 mm caster ball.
 3. Exact cliff-bay forward offset in mm (A4) — needs the stopping-distance calc at 0.10 m/s to convert ">=50 mm lead" into a plate coordinate.
 4. Battery fore/aft trim for CG (A6) — needs module mass estimates.
 5. **(v1.1)** Wire-channel dimensions — minimum channel width/depth, bend radius, strain-relief clearance, and connector service slack (cliff bay -> mux -> core).
@@ -132,7 +169,7 @@ Q's check caught a real error in the draft: items filed as arithmetic that are a
 9. **OPEN DECISION — D4 fastener / interface method.** Not a number. Decides serviceability, print orientation, insert style, frame stiffness, and whether the top/core can come off **without disturbing the safety plate**. A real fork with safety consequences.
 10. **OPEN DECISION — fuse rating.** Not placement. An electrical-safety decision tied to wire gauge, stall current, transient tolerance, and nuisance-trip risk.
 11. **OPEN DECISION — E-stop actuator type and placement.** Not geometry. A human-access safety decision: reachable, unambiguous, fast under stress.
-12. **(v1.1) OPEN DECISION — motor-mount method.** Not a number. Options: Pololu stamped bracket / printed cradle / through-plate clamp. This fork sets how far the axle sits below the deck, and therefore feeds COMPUTE for deck Z, caster shim, motor wire exit, and wheel-cutout shape. Chain: motor-mount decision -> axle Z confirmation -> deck Z -> caster shim -> bottom-plate rib clearance.
+12. **(v1.2) RESOLVED — motor mount = printed cradle.** (Was OPEN DECISION in v1.1.) The Pololu #2676 bracket is **not in the BOM** — packing slip 1J584435 confirms the order: 2× #4885 gearmotors, #3690 wheels, #713 driver, #2858 buck, #2692 caster — no bracket. Cradle chosen on the hierarchy: prints in-house this weekend (no buy/lead time), tunable standoff, and integrates encoder clearance + wire exit + keyed-hub alignment in one part; the motor drops out **below a solid, uncut plate** (serviceability-first). Trade-off owned explicitly: in-house stiffness/tolerance instead of the bracket's metal precision. Closing this fork closed the whole deck-Z chain: cradle -> deck top ~57 -> ground clearance 27.5 + caster shim (A5) -> derived shell ~90 (A1.1).
 
 ### B7. Held items & space reservations (not buys yet, but they claim volume now) **(v1.1)**
 These are not populated in V1 and are not open gates before CAD-final, but they affect volume and routing, so CAD must reserve for them now rather than discover them later.
@@ -146,12 +183,13 @@ These are not populated in V1 and are not open gates before CAD-final, but they 
 
 This artifact is committable because it states:
 1. Datum is **`DRIVE_AXLE_FLOOR_DATUM`** (floor-contact plane, between drive wheels, on travel centerline) — not the shell center.
-2. **200 mm = X / fore-aft, 180 mm = Y / width, 72 mm = Z / shell height** (Q-confirmed, not flipped).
+2. **(v1.2 revised)** Axis *convention* locked (X = fore-aft, Y = width, Z = vertical, not flipped); *magnitudes provisional*: 200/180 are footprint targets, and **Z = derived ~90 mm shell height — the 72 mm cap is killed** (it was an under-spec, not a constraint; receipt in A1.1).
 3. **80 mm wheels are V1-locked and protrude through side cutouts** as real-envelope truth.
 4. **Cliff lookahead >= 50 mm at <= 0.10 m/s**; above that speed → recompute + bench validation.
 5. **Left/right downward ToF installed, center pocket reserved.**
-6. **Fastener method, fuse rating, and E-stop placement are OPEN DECISIONS**, not mere arithmetic.
+6. **Fuse rating and E-stop placement are OPEN DECISIONS**, not mere arithmetic; **D4 fastener** still open. **(v1.2)** motor mount is now CLOSED (printed cradle).
 7. **(v1.1)** This amendment **sharpens `60810ce`; it does not replace it.** No locked truth was moved. Added: `FRONT_MODULE_INTERFACE_DATUM` + cone-clearance rule; the explicit two-ToF safety non-claim; motor-mount method as an OPEN DECISION (with deck height gated under it); wire-channel and cliff-vertical measurables in COMPUTE; KB2040 / load-disconnect / Pi-UPS as held / space-reserve.
+8. **(v1.2)** The body envelope is **provisional**, governed by the design hierarchy (physics/safety → work-on → assemble → service → durable → pretty-last). The envelope yields to physics/serviceability and records what it yielded to (receipt rule). Concrete results this revision: **72 mm cap killed**, height **derived ~90 mm** (A1.1), motor mount = **printed cradle**, **deck top ~57 mm**, **ground clearance 27.5 mm**. The ~90 is soft above the deck until the Pi-stack height and shell-wall thickness are measured.
 
 ## Bottom line
 
@@ -160,5 +198,7 @@ The footprint has a named datum (`DRIVE_AXLE_FLOOR_DATUM`), a locked axis conven
 **Q lock:** *The datum is not the shell. The datum is where motion meets the floor. Start there.*
 
 **v1.1 lock (Q):** *`60810ce` is the foundation. v1.1 does not move the datum. It adds the missing reservations, non-claims, and gated measurements.*
+
+**v1.2 lock:** *The 72 mm cap is dead — it was inherited, not derived, and it proved an under-spec. Height is now computed from the floor up (~90 mm) with a receipt, and the envelope yields to physics. The motor mount is a printed cradle; deck top ~57 mm, ground clearance 27.5 mm. Compact where possible, accessible where necessary, safe always, pretty last.*
 
 **Truth over comfort. The shell obeys the schematic. The plate obeys the wheels.**
