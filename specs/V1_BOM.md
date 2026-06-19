@@ -28,8 +28,8 @@ Every line is tagged:
 | XT60H connectors | HAVE / CONFIRM | Count from photo unconfirmed (Q1). Count the bag. |
 | SPST rocker switch (KCD1) | HAVE | But placement not in CAD — see DECIDE D1. |
 | SKYRC iMAX B6AC charger | HAVE | Bench. Storage mode habit. |
-| **LiPo low-voltage alarm buzzer (1–8S)** | **BUY** | ×2–3. Independent balance-lead scream-box. Bench immediately. (Q-specced) |
-| **Pololu ideal-diode / reverse-voltage protector, 4–60V, 20A or 25A** | **BUY** | Reverse-polarity + placed after fuse/switch, before bus branch. (Q-specced) |
+| LiPo low-voltage alarm buzzer (1–8S) | HAVE | ×4 in hand (Apex #1655, inv row 99). Independent balance-lead scream-box. |
+| Pololu reverse-voltage protector, 4–60V 25A | HAVE | #5387 non-blocking, in hand (inv row 97). After fuse/switch, before bus branch. |
 | **Inrush / soft-start** | **DECIDE/BUY** | Name as its own schematic block. Confirm whether the reverse protector's datasheet also covers inrush; if not, add a soft-start part. |
 | **Hardware low-voltage LOAD-DISCONNECT (not a pack-building BMS)** | **DECIDE → BUY** | The real safety layer. Must be an inline discharge-path cutoff for a *finished RC pack*, NOT a cell-building 3S BMS. Exact part TBD. **Do not buy a generic "3S BMS / protection / 60A lithium" board.** |
 | **Raspberry Pi UPS / 5V hold-up board (Pi 3)** | **DECIDE → BUY** | For graceful shutdown (F14). Buy only after a mechanical fit-check against Pi 3 + chassis. |
@@ -75,7 +75,8 @@ Every line is tagged:
 | Item | Status | Note |
 |---|---|---|
 | Pi Global Shutter Camera + 6mm wide lens + 24in flex | HAVE | Core vision. Global shutter is deliberate (motion). |
-| VL53L4CD ToF ×2 | HAVE | Both 0x29 → isolate via PCA9548 mux (F12). |
+| VL53L4CD **forward** ToF ×2 (Adafruit #5396) | HAVE | Ridge, flank camera. Both 0x29 → PCA9548 mux (F12). |
+| VL53L4CD **downward cliff** ToF ×2 (Pololu #3692) | HAVE | Front-L/R underside, drop detection. Both 0x29 → mux. Received; logging as inv rows 96+. |
 | BNO085 IMU | HAVE | Proprioception/tip detect (F2). Use UART-RVC or SPI (F10). 2nd unit = spare or ridge? (Q3). |
 | PCA9548 I2C mux ×2 | HAVE | Resolves ToF address collision. |
 | DS3231 RTC | HAVE | Timestamps significance. 2nd shares 0x68 → cannot share bus (F12). |
@@ -87,7 +88,7 @@ Every line is tagged:
 ### Reflex-layer sensors (Layer-1, if KB2040 topology chosen — D3)
 | Item | Status | Note |
 |---|---|---|
-| IR reflectance (cliff/edge) | HAVE | From 37-in-1 kit (F16). Read directly by KB2040. |
+| IR reflectance (cliff/edge) | HAVE | From 37-in-1 kit. **Now bench-only backup** — cliff resolved to dedicated VL53L4CD ToF (Pololu #3692); IR is not trusted V1 fall protection (F16). |
 | Shock/tilt (impact/tip) | HAVE | From 37-in-1 kit / BNO085. |
 | HC-SR501 PIR ×5 | HAVE / DECIDE | At-rest presence only, zero-velocity gated (F17). Array vs spares (Q6). Domes must be exposed → shell openings (F17/D5). |
 
@@ -104,18 +105,19 @@ Every line is tagged:
 | Hookup wire 22AWG silicone | HAVE | Consider 20/18AWG on pack +lead. |
 | JST-XH connector kit | HAVE | Body-to-ridge bus (6-wire locked, F6/D6). |
 | Heat-shrink kit | HAVE | Consumable. |
-| **Heat gun** | **CONFIRM → maybe BUY** | T1: heat-shrink + XT60 solder + heat-set inserts all want one. Confirm owned; if not, BUY. |
+| Heat gun | HAVE | SEEKONE HG350 in hand (inv row 98). Heat-shrink + XT60 solder. (Heat-set inserts use a soldering iron.) |
 
-**Possible only buy here: a heat gun, if not already owned.** Plus confirm filament quantities.
+**No buys here now (heat gun received).** Just confirm filament quantities.
 
 ---
 
 ## 6. The complete BUY list (one trip)
 
 **Order now — safe, specced:**
-1. **LiPo low-voltage alarm buzzer (1–8S)** — ×2–3
-2. **Pololu ideal-diode / reverse-voltage protector** — 4–60V, 20A or 25A
-3. **Heat gun** — *if not already owned* (confirm first)
+*(All three cleared — now in hand, inventory rows 97–99.)*
+1. LiPo low-voltage alarm buzzer — ✓ Apex #1655 ×4
+2. Reverse-voltage protector — ✓ Pololu #5387 (non-blocking 25A)
+3. Heat gun — ✓ SEEKONE HG350
 
 **Order once decided (don't guess the part):**
 4. **Hardware low-voltage load-disconnect** — inline discharge cutoff for a finished RC pack (NOT a cell-building BMS). Pin exact part first.
@@ -150,11 +152,11 @@ Every line is tagged:
 - Q2: Geekworm standoff kit — 1 or 2 boxes
 - Q3: 2nd BNO085 — ridge or spare
 - Q5: Pi 3 model B vs B+ (read silkscreen)
-- T1: heat gun owned?
+- T1: heat gun owned? — **YES** (SEEKONE HG350, inv row 98)
 - Filament: enough for all four modules + calibration + spares?
 
 ---
 
 ## Bottom line
 
-V1's parts are ~95% in hand. The shopping trip is small: **two safety parts for sure (alarm + reverse protector), a heat gun if you lack one, and 2–4 more once their exact part is pinned.** The real work before the build is the six **decisions** — none cost money, several block the print. Settle compute topology (D3) first.
+V1's parts are ~95% in hand. The alarm, reverse protector, and heat gun are now **in hand** — the remaining buys are just the 2–4 **decide-then-buy** items (load-disconnect, Pi UPS, inrush, charge lead). The real work before the build is the six **decisions** — none cost money, several block the print. Settle compute topology (D3) first.
