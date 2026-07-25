@@ -1,12 +1,12 @@
 # V1_CRADLE_SPEC_PASS_1
 
-> **What this is:** the first spec for QD's printed motor cradle — a **fit-test coupon**, not the final structural chassis piece. Drafted by Claude; Q-audited (10 constraints + load path folded in); for Darrell ratification → commit. All dimensional inputs are the MEASURED values committed to `V1_CAD_GATE_MEASUREMENTS.md` at `9ebee5f`.
+> **What this is:** the first spec for QD's printed motor cradle — a **fit-test coupon**, not the final structural chassis piece. Drafted by Claude; Q-audited (10 constraints + load path folded in); **amended (rev 2) per Q** — `C_cup` is diametral, the saddle is *secondary support* (not continuous load-share), and anti-backward is explicit L/R ID + keying. For Darrell ratification → commit. All dimensional inputs are the MEASURED values committed to `V1_CAD_GATE_MEASUREMENTS.md` at `9ebee5f`.
 >
 > **Prime directive (Q):** a measured component dimension is *part truth*, not a printed dimension. Every printed clearance below is a **PARAMETER** resolved by coupon test — never a silent copy of a measured number.
 
 ## 0. Architecture & load path
 
-Face-mount. The **motor face is the datum** — it sets axial position and rotational orientation. The two M3 fasteners (into the motor's tapped faceplate holes) *retain* the motor. A shallow body **saddle** *supports* it against wheel-impact and cantilever loads. **The face locates; the saddle supports** — the saddle is NOT a press-fit clamp.
+Face-mount. The **motor face is the datum** — it sets axial position and rotational orientation. The two M3 fasteners (into the motor's tapped faceplate holes) *retain* the motor. A shallow body **saddle** provides **secondary support** — with slip clearance it acts as a **catch that limits deflection and impact loading**; it does **not** automatically share continuous load with the face mount. **The face locates and carries; the saddle catches** — it is NOT a press-fit clamp. *(If continuous load-sharing is later required, that needs a fit-verified contact surface, shim, or compliant interface in the structural revision — not this coupon. Q#2.)*
 
 **Load path (Q-ratified):**
 
@@ -33,14 +33,14 @@ Every value below is a **starting guess for coupon rev A**, explicitly a paramet
 
 | Param | Meaning | Applied as | Coupon-A start | Locked? |
 |---|---|---|---|---|
-| `C_cup` | saddle radial clearance (slip, not clamp) | bore = 24.79 + 2·C_cup | +0.35 → bore ~25.5 | pending |
+| `C_cup` | saddle **diametral** clearance (slip catch, not clamp) | cup ID = 24.79 + C_cup | +0.35 → **ID 25.14** | pending |
 | `C_hole` | M3 through-hole clearance (screw passes free) | printed hole Ø | 3.4 | pending |
 | `D_pocket` | boss pocket **radial** clearance | pocket Ø = 6.93 + 2·D_pocket | +0.40 → Ø ~7.7 | pending |
 | `H_pocket` | boss pocket **axial** clearance | pocket depth = 2.42 + H_pocket | +0.40 → depth ~2.8 | pending |
 | `C_wire` | wire-exit + bend-radius clearance | rear-open envelope | ≥ wire bend radius (TBD) | pending |
 
 Why each matters:
-- **`C_cup` is a slip fit, not a clamp (Q#2).** The saddle cradles the body; it does not squeeze it. Too tight and the saddle fights the face for axial/rotational control and can cock the motor off-datum.
+- **`C_cup` is DIAMETRAL clearance (Q#1), and a slip catch, not a clamp (Q#2).** Convention: cup ID = body_OD + C_cup = 24.79 + 0.35 = **25.14** (0.35 total across the diameter — *not* per side; ~0.175 radial gap). The saddle cradles the body without squeezing it; too tight and it fights the face for axial/rotational control and cocks the motor off-datum. Its role is **secondary support / impact-catch** (see §0), never continuous load-sharing in this coupon.
 - **The boss pocket needs BOTH radial and axial clearance (Q#5).** If the pocket is shallower than 2.42, the boss bottoms out and the flat faces never meet → flushness fails and the datum is lost. Depth must exceed boss height with margin; diameter must exceed boss Ø with margin.
 - **`C_wire` (Q#3)** must let the connector seat, the bundle bend at ≥ its minimum radius, and the motor pull straight back out **without cutting wires**.
 
@@ -61,7 +61,7 @@ Worked example (parameters, coupon-A): with `T_plate` = 4.0 and a 0.5 washer, an
 - **Face plate** — flat surface that mates to the motor's flat faceplate ring (the metal around the boss). This is the datum face. Thickness `T_plate` (feeds §3).
 - **2× M3 through-holes** — on the **16.63 spacing (fixed)**, symmetric about the shaft/boss axis, Ø = `C_hole`. Clearance holes; the threads engage the *motor*, not the cradle.
 - **Boss clearance pocket** — concentric with the shaft axis; Ø = 6.93 + 2·`D_pocket`, depth = 2.42 + `H_pocket`. Recesses the boss so the flat faces meet.
-- **Body saddle** — partial-wrap cradle of the 24.79 body; bore = 24.79 + 2·`C_cup`. Wraps the **front (silver) portion only** — begins just aft of the face, spans a supporting length of the ~52 mm silver can, and **stops before the encoder cap.** Open-topped (partial wrap) for drop-in and service; NOT a full clamp.
+- **Body saddle** — partial-wrap **secondary-support** cradle of the 24.79 body; cup ID = 24.79 + `C_cup` (**diametral**). Wraps the **front (silver) portion only** — begins just aft of the face, spans a supporting length of the ~52 mm silver can, and **stops before the encoder cap.** Open-topped (partial wrap) for drop-in and service; a catch that limits deflection/impact, NOT a clamp and NOT a continuous load path (see §0).
 - **Rear-open zone** — from the end of the saddle rearward: fully open. Clearance for the ~14.5 encoder cap, the connector, the wire bend radius (`C_wire`), and straight-back removal without cutting wires.
 
 ## 5. Handedness — mirrored L/R (Q#10)
@@ -73,7 +73,10 @@ The two cradles are **mirror images**, and the spec makes a backward install mec
 - **encoder / wire exit** on the **inboard** side (toward centerline, into the wire channel)
 - **motor-wire orientation** per side
 
-Anti-backward: the wheel-clearance relief (outboard) and the wire-exit (inboard, rear) sit on **opposite sides**. A cradle installed backward would aim the wire exit outboard and foul the wheel envelope — visibly and mechanically wrong. If the coupon shows that isn't obvious enough by feel, add a small keyed/asymmetric datum notch.
+Anti-backward (Q#3) — **primary method is explicit identification + keying**, not fouling:
+- **Molded-in `L` / `R` identification** on each cradle (raised or recessed letter on the outboard face).
+- **Asymmetric keying** — an asymmetric datum notch / wire-exit geometry so each cradle seats only one way into the skeleton; a mirror part physically will not fit the wrong mount.
+- **Secondary physical check (not primary):** a backward cradle also aims the wire exit outboard and fouls the wheel envelope — a useful visible cross-check, but the ID + keying is the guard.
 
 ## 6. This first artifact = FIT-TEST COUPON (Q#7)
 
