@@ -8,6 +8,8 @@
 
 **Status legend:** `CONFIRM` published on a manufacturer drawing — verify your part matches · `MEASURED ✓` value already in hand · `MEASURE` no drawing exists, calipers required · `WEIGH` needs scale + mass mock-up · `COMPUTE` derived from other rows/decisions · `GATED` can't be taken until a named OPEN DECISION is made first.
 
+> **Bench session 2026-07-25 — drive corner MEASURED off the real parts:** motor OD **24.79** · M3 hole spacing **16.63** (confirmed two ways: direct + edge-to-body) · boss **6.93 Ø × 2.42 tall** · overall length **66.51** (silver body ~52 / integrated encoder cap ~14.5) · collet stack **12.98** · wheel OD **80.30** → axle Z **40.15** · tire **8.78 full / 7.03 contact** (crowned) · computed track **~171**. §A rows below promoted CONFIRM/MEASURE → MEASURED ✓.
+
 **Source tags / drawings (pull these before the bench session):**
 - `[PL-25D]` Pololu 25D gearmotor dimension diagram — https://www.pololu.com/product/4885 → "dimension diagram (PDF)"
 - `[PL-3690]` Pololu 80×10 multi-hub wheel — https://www.pololu.com/product/3690
@@ -25,13 +27,14 @@
 
 | Measurement | Why CAD needs it | Tool / method | Status | Blocks | Source |
 |---|---|---|---|---|---|
-| #4885 faceplate: 2× M3 hole spacing + center-boss Ø | cradle bolt pattern + pilot bore | read diagram, confirm part | CONFIRM | cradle, deck Z | `[PL-25D]` |
+| #4885 faceplate: M3 hole spacing + boss Ø + boss height | cradle bolt pattern + pilot bore + pocket depth | **caliper, bench** | **MEASURED ✓ spacing 16.63 · boss Ø 6.93 · boss ht 2.42** | cradle, deck Z | `[BENCH]` |
 | Cradle screw depth limit | bolts can't hit gears | drawing note: **≤6 mm into faceplate holes** | CONFIRMED ✓ | cradle bolt spec | `[PL-25D]` |
-| #4885 body Ø + length (25 × 67) | cradle cup ID + inboard reach | diagram + confirm | CONFIRM | cradle, motor-sandwich gap | `[PL-25D]` |
-| Encoder backshell length (~15 mm = 67L − 52L bare) | inboard clearance + motor-wire exit | diagram (encoder vs bare gearbox), confirm | CONFIRM | cradle rear clearance, wire channel | `[PL-25D]` |
+| #4885 body OD + overall length | cradle cup ID + inboard reach | **caliper, bench** | **MEASURED ✓ OD 24.79 · overall 66.51** (silver body ~52 + encoder cap ~14.5) | cradle, motor-sandwich gap | `[BENCH]` |
+| Encoder tail cap (rear) length | rear clearance + motor-wire exit | **caliper, bench** | **MEASURED ✓ ~14.5** — integrated tail cap, no separate protrusion; cradle leaves rear open | cradle rear clearance, wire channel | `[BENCH]` |
 | Shaft 4 mm D, extends 12.5 mm from faceplate | collet engagement + wheel offset | diagram | CONFIRMED ✓ | wheel track | `[PL-25D]` |
-| **Collet stack width** (faceplate → wheel face), #3690 on shaft | sets **wheel track** + the ~16 mm center gap | assemble collet on shaft, **caliper** | **MEASURE** | **track, gap, side cutouts, plate** | `[BENCH]` |
-| Wheel actual OD + width **with silicone tire** (nom 80 × 10) | side-cutout size, ground clearance, protrusion | **caliper assembled wheel** | MEASURE | cutouts, clearance, shell Z | `[BENCH]` / nom `[PL-3690]` |
+| **Collet stack width** (faceplate → outer wheel face), #3690 on shaft | sets **wheel track** + the center gap | assembled, **caliper** | **MEASURED ✓ 12.98** | track, gap, side cutouts, plate | `[BENCH]` |
+| Wheel OD + tire width **with silicone tire** | side-cutout size, ground clearance, axle Z | **caliper assembled wheel** | **MEASURED ✓ OD 80.30 (→ axle Z 40.15) · tire 8.78 full / 7.03 contact (crowned)** | cutouts, clearance, shell Z | `[BENCH]` |
+| **Wheel track** (contact-line to contact-line) | drive geometry / straight tracking | COMPUTE from collet + tire + body width | **COMPUTE ~171** — contact 8.59 outboard of faceplate; flush in 180-wide body (provisional on body width + flush-mount choice) | plate, side cutouts, PASS_2 | design |
 
 ## B. Battery + access
 
@@ -94,7 +97,7 @@
 ## What the drawings already settle (no bench time needed beyond a confirm)
 
 Pulled this session, treat as CONFIRM-against-drawing, not blind measure:
-- **Motor #4885** — body <25 mm Ø, 4 mm D shaft out 12.5 mm, 2× M3 faceplate holes, **≤6 mm screw depth** (gears), encoder backshell ~15 mm (67L − 52L bare). All on `[PL-25D]`.
+- **Motor #4885** — now **MEASURED off the part** (bench 2026-07-25): OD 24.79 · M3 spacing 16.63 · boss 6.93 Ø × 2.42 · overall 66.51 (silver ~52 / cap ~14.5). Shaft 4 mm D out 12.5 & **≤6 mm screw depth** still per `[PL-25D]`.
 - **Pi 3** — 85 × 56 PCB, standard M2.5 hole pattern, **tallest connector 16.0 mm**. All on `[RPI3]`.
 - **Caster #2692** — 29 mm, 3× M3. `[PL-2692]`. **MEASURED ✓.**
 - **Battery** — 75 × 34 × 26.5. `[ZEEE]`.
