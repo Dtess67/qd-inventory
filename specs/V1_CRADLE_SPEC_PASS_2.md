@@ -1,99 +1,88 @@
 # V1_CRADLE_SPEC_PASS_2
 
-> **What this is:** the structural cradle specification. It builds on the Rev-A coupon, which is **FIT_VERIFIED** at `79badc6` (dimensional compatibility proven). Pass 2 turns the proven fit into a mountable, serviceable, load-bearing cradle and defines a **separate structural gate**. Drafted by Claude; Q-audited (Pass-2 pressure brief folded in); for Darrell ratification → commit.
+> **What this is:** the structural cradle specification. Builds on the Rev-A coupon (**FIT_VERIFIED** at `79badc6`). Turns the proven fit into a mountable, serviceable, load-bearing cradle and defines the structural evidence gates. Drafted by Claude; **Q-audited twice** (Pass-2 pressure brief + Pass-2 audit, both folded — rev 2). For Darrell ratification → commit.
 >
-> **Two-gate model:**
-> - `FIT_VERIFIED` — dimensional compatibility. **Already earned** for the Rev-A geometry (`79badc6`).
-> - `STRUCTURE_VERIFIED` — survives bounded wheel/torque loads. **New gate, defined in §6.** Not yet earned.
+> **Evidence states (kept separate; a later gate never overwrites an earlier one):**
+> - `FIT_VERIFIED` — dimensional compatibility + service fit. **Earned** for Rev-A geometry (`79badc6`).
+> - `CRADLE_STRUCTURE_VERIFIED` — survives defined loads on a **controlled rigid fixture**, without unacceptable movement, damage, or encoder interference. New (§6).
+> - `ROVER_INTERFACE_VERIFIED` — retested after attachment to the **real skeleton / bottom plate**. New (§6). A surrogate fixture never certifies the chassis.
 >
-> **Prime rule (Q#4):** any geometry changed from Rev A **loses automatic FIT_VERIFIED** and must be retested. Validated Rev-A parameters remain *evidence*, not a free pass.
+> **Prime rule (Q):** a part can be structurally strong and dimensionally wrong, or fit perfectly and be weak. Changed geometry loses automatic FIT_VERIFIED and re-enters the fit gate. Structural results do not overwrite fit evidence.
 
 ## 0. Datum & load path (preserved)
 
-- **Motor face = axial + rotational datum** (Q#1). The saddle must **not fight the face mount or preload the motor.** The face locates and carries; the body support catches.
-- **Load path (Q#7, explicit):**
+- **Motor face = axial + rotational datum.** The saddle must not fight the face mount or preload the motor.
+- **Load path:** `wheel → shaft / gearbox → motor face + secondary body support → cradle → skeleton`. The **encoder cap + wiring are outside the structural path** — no load reaches them.
 
-  `wheel → shaft / gearbox → motor face + secondary body support → cradle → skeleton`
+## 1. Inherited & preserved constraints (frozen from Rev A)
 
-  The **encoder cap and wiring are outside the structural path** — no load reaches them, ever.
+Carried forward unchanged: 2× **M3×8** face screws (~4 mm engagement, **≤6 mm intrusion**), **open encoder tail** (~14.5 cap + connector + wire bend), **wheel envelope** (Ø80.30 + 8.78 tire + margin), **molded L/R + asymmetric keying**. Validated Rev-A slip params (evidence for the QIDI X-Plus 4 / PLA Rapido / 0.20 Standard profile): `C_cup` 0.35 diametral (ID 25.14), `C_hole` 3.4, boss pocket 7.73 × 2.82, `T_plate` 4.0, saddle arc **180°**, `saddle_len` 22.
 
-## 1. Inherited & preserved constraints (frozen from Rev A — Q#6)
+## 2. Retention — SELECTED: 180° saddle + compression-limited strap (Q + Claude agree; Darrell ratifies)
 
-Carried forward unchanged; if a change forces one of these, it is flagged and retested:
-- **2× M3×8** face screws, ~4 mm motor engagement, **≤6 mm intrusion** (gear limit).
-- **Open encoder tail** — full clearance for the ~14.5 mm cap, connector, and wire bend radius.
-- **Wheel envelope** — Ø80.30 + 8.78-wide tire + margin on the outboard side.
-- **Molded L/R identification + asymmetric keying** (primary anti-backward).
-- **Validated Rev-A slip params (evidence):** `C_cup` 0.35 diametral (ID 25.14), `C_hole` 3.4, boss pocket 7.73 × 2.82, `T_plate` 4.0, saddle arc **180°**, `saddle_len` 22 — *for the QIDI X-Plus 4 / PLA Rapido / 0.20 Standard profile.*
+Keep the verified 180° saddle **exactly** and add a **removable upper strap/cap** as separate retention. (Option B, over-center capture, rejected: changes validated cup geometry, introduces uncontrolled clamping, depends on orientation + fatigue, complicates removal, forces the fit gate to repeat across the whole interface.)
 
-## 2. Retention approach — OPEN DECISION (Q#3)
+**The strap is retention, not a hose clamp (Q).** It **must** contain a **hard compression stop / fixed standoff**: the strap bolts bottom against structure *before* the strap can squeeze the 24.79 mm can. Concretely, the standoff sets the strap inner radius = (24.79/2) + designed clearance, so a fully-torqued strap still cannot preload the motor.
 
-Three approaches compared; selection on **serviceability, repeatability, and preserving the verified fit — not minimum part count.**
+**Record (required):** designed strap-to-motor clearance · compliant pad used? (y/n) · maximum bolt torque · installed gap / compression-stop condition · **confirmation the motor still slides into the verified saddle without preload.**
 
-| approach | preserves verified fit? | serviceability | risk |
-|---|---|---|---|
-| **A. Proven 180° saddle + separate mechanical retention** (bolt-on upper strap/cap) | **Yes — slip surface untouched** | high (remove strap → lift motor) | extra part + 1–2 fasteners |
-| B. Relieved / flexible over-center capture (>180°, snap-in) | **No — arc change, loses FIT_VERIFIED** | medium | can clamp the motor (kills the verified slip); flex fatigue |
-| C. Removable upper strap or cap | Yes (same family as A) | high | same as A |
+## 3. Saddle arc policy
 
-**Claude lean (for ratification): Approach A/C — keep the verified 180° saddle exactly, add a removable bolt-on upper strap as the retention.** Rationale: it leaves the FIT_VERIFIED slip surface *untouched*, so retesting is confined to the new strap + skeleton interface, not the proven motor fit. Approach B is rejected for Pass 2: it changes the arc (voids FIT_VERIFIED), and Q#2 is right that a rigid over-center arc risks converting the proven slip into a clamp. **Darrell ratifies.**
+**Retain 180°.** Do not auto-promote a >180° capture arc; any arc change re-enters the FIT gate and risks converting the verified slip into a clamp.
 
-## 3. Saddle arc policy (Q#2)
+## 4. Skeleton interface + alignment (parameterized)
 
-**Do NOT auto-promote the ~200° capture arc.** The 180° arc is FIT_VERIFIED as a *slip*. Before any arc change, the **motor install/removal path must be defined**; a rigid over-center arc may turn the slip into a clamp or demand damaging flex. **Default: retain 180° and add separate retention (§2). Any arc change → re-enter the FIT gate.**
+### 4a. Skeleton interface (forward-dependent on the not-yet-existing bottom plate)
+Parameters: fastener locations `SK_hole_*` (TBD vs plate; likely M3 → heat-set inserts) · **load direction** (reacts wheel cantilever + drive-torque reaction) · **L/R mirror** (keyed so a cradle can't seat wrong-hand) · **cradle anti-rotation on the skeleton** · **tool access** with motor installed · **removal without disturbing encoder wiring**.
+*Note (Q-confirmed): motor-vs-cradle anti-rotation is carried by the **two M3 face screws** as a torque couple across the 16.63 spacing — the slip saddle is **not** credited with rotational resistance unless deliberate contact-under-deflection is measured.*
 
-## 4. Skeleton interface — parameterized datum (Q#5)
+### 4b. Track-adjustment / alignment (filed here per Q — it creates *adjustment capability only*, it does NOT resolve track)
+A plain slot + tightened bolts is insufficient — it makes a slip plane and a yaw-error path. Define: **hard reference datum** · adjustment direction · clamping surface area · washer / load-spreader geometry · anti-rotation feature · **method to keep L/R axles parallel** · **method to lock movement after track is set** · **witness marks** to detect slip. It must **not permit toe-in / toe-out or unequal axle Z**.
+**Claude lean:** given FDM friction repeatability is poor, prefer a **fixed datum + indexed positions (or shims)** over a friction slot, unless the slot can be made repeatable and positively locked. *(Darrell/Q to decide.)*
 
-The skeleton does not exist yet, so this interface is defined **parametrically**; values that depend on the bottom plate are placeholders until the plate/skeleton is drawn (forward dependency, flagged).
+## 5. FIT carry-over + retest rule
 
-- **Fastener locations** — `SK_hole_x/y/pattern` (TBD vs plate); type/size TBD (likely M3 into heat-set inserts, per chassis standard).
-- **Load direction** — primary is the wheel cantilever + drive-torque reaction into the skeleton; interface must react both.
-- **Adjustment range** — `SK_adjust` slot range for track/toe trim (a few mm), so track can be tuned without reprinting (ties §7).
-- **L/R mirroring** — interface mirrors with the cradle; keying prevents a cradle seating in the wrong-hand mount.
-- **Anti-rotation** — the interface (not the slip saddle) resists the cradle rotating on the skeleton; **note: motor-vs-cradle anti-rotation is carried by the 2 face screws (torque couple across 16.63), NOT the slip saddle** — verify in §6.
-- **Tool access** — skeleton fasteners reachable with the motor installed.
-- **Wiring-safe removal** — cradle detaches from skeleton (and motor from cradle) **without disturbing the encoder wiring.**
+Rev-A FIT_VERIFIED covers the motor-mating geometry only (face, boss pocket, 2× M3, 180° saddle slip) and carries forward **only if unchanged.** New surrounding geometry means the Pass-2 prototype **re-confirms** Rev-A fit (§8). Structural testing is recorded in its own state and **does not overwrite** the fit evidence.
 
-## 5. FIT carry-over + retest rule (Q#4)
+## 6. Structural gates + bounded test
 
-Rev-A FIT_VERIFIED covers the **motor-mating geometry only** (face, boss pocket, 2× M3, 180° saddle slip). It carries forward **only if those features are unchanged.** Anything altered — arc coverage, axial length, plate geometry, print orientation — **re-enters the FIT gate.** The Pass-2 prototype re-confirms Rev-A fit is intact (§8) precisely because new geometry surrounds it.
+**Torque method — NON-POWERED (Q correction):** do **not** prove the cradle by holding the motor at stall through the TB6612FNG — that conflates a structural test with driver-overcurrent + motor-heating, and the TB6612 margin is narrow. Instead apply an **externally measured tangential force at the wheel radius**, or a **mechanical torque fixture**. Target = **max credible drivetrain torque × safety factor**. A brief current-limited powered test may later confirm system behavior — not primary structural proof.
 
-## 6. STRUCTURE_VERIFIED gate — bounded structural test (Q#8)
+**Every test states:** load magnitude · direction · application point · duration · number of cycles · fixture · safety factor · max allowed temporary deflection · max allowed permanent set · pass/fail observations.
 
-FIT_VERIFIED proves it fits; it does **not** prove it survives wheel loads. `STRUCTURE_VERIFIED` is earned only by a **bounded, defined** test (not FEA, not "seems sturdy"):
+**Test vectors:**
+1. Vertical cantilever load at the wheel-contact location
+2. Lateral wheel load
+3. Fore/aft wheel load
+4. Drive-torque reaction (non-powered, per above)
+5. Axial motor pull-out
+6. Upward retention / strap separation
+7. Repeated-load cycling
+8. Encoder-cap + wire-clearance inspection **while loaded**
 
-- **Setup:** Pass-2 cradle bolted to a fixed stand-in for the skeleton via the §4 interface; motor + wheel (or mass proxy at the wheel offset) installed; retention engaged.
-- **Load 1 — cantilever/impact:** static lateral load at the wheel-contact offset = `F_lat` (target ~2–3× per-wheel static rover weight; value set once rover mass is estimated). **Pass:** deflection fully recovers (no permanent set), no crack.
-- **Load 2 — drive-torque reaction:** apply torque to the shaft up to the #4885 stall torque. **Pass:** motor does **not** rotate in the cradle (face screws hold), no crack at the face, boss stays seated.
-- **Load 3 — retention pull-out:** upward/pull-out load on the motor. **Pass:** retention holds the motor seated.
-- **Encoder check (all loads):** **zero load reaches the encoder cap or wiring.**
-- **Record (required for the tag):** printer · filament · nozzle · layer · orientation · profile · part rev · applied loads · results. No metadata / no defined loads → no STRUCTURE_VERIFIED.
+**Witness marks:** across **each screw head ↔ cradle face** (detect micro-rotation) and across the **track clamp** (detect slip).
+**Anti-rotation inspection:** screw-head seating · material beneath screw heads · hole elongation · faceplate cracking · screw loosening · motor-face rotation.
 
-## 7. Track status — provisional only (Q on track)
+**Pass requires:** no cracking / layer separation · no visible hole elongation · no screw rotation / loosening · no motor-face separation · no permanent axle-position shift beyond stated tolerance · motor remains removable · encoder cap unloaded · wiring unpinched · **Rev-A face-flushness + saddle-slip intact.**
 
-- Previous estimate: **~171 mm.**
-- Current working estimate after the 1.6 mm outward shift per side (from the 4 mm face wall): **~174.2 mm.**
-- **Neither is authoritative.** Track becomes measured or design-locked **only after** Pass 2 fixes: structural **plate thickness**, the **wheel seating plane**, and the **skeleton interface** — and the actual wheel-seating geometry exists together with the cradle. The §4 `SK_adjust` slot exists so final track can be trimmed physically. Until then: **~174.2 provisional.**
+**Two gates:** on the controlled rigid fixture → `CRADLE_STRUCTURE_VERIFIED`. Retested on the real skeleton/plate → `ROVER_INTERFACE_VERIFIED`. **Record for either:** printer · filament · nozzle · layer · orientation · profile · part rev · **applied loads** · results. No metadata / no defined loads → no gate.
 
-## 8. Pass-2 prototype scope (first print — Q#9)
+## 7. Track status — provisional only
 
-The first Pass-2 print is a **prototype, not the final skeleton.** It must confirm:
-1. Rev-A **fit remains intact** (face flush, boss, 2× M3, saddle slip).
-2. **Installation + removal remain practical** (with retention).
-3. **Retention does not clamp** the motor (still a slip, not a preload).
-4. **Skeleton attachment is rigid.**
-5. **Wheel + tool clearance survive** the added structure.
-6. **No load reaches the encoder cap.**
+Previous ~171 → after the 1.6 mm/side outward shift, working estimate **~174.2 mm**. **Neither authoritative.** The §4b slot creates adjustment capability, not resolution. **Track becomes measured / design-locked only when the assembled left + right wheel contact centerlines are physically measured under the final locked interface.**
 
-(Structural loads per §6 come after the prototype confirms the above — fit and function first, then the load gate.)
+## 8. Pass-2 prototype scope (first print = prototype, not final skeleton)
+
+Confirm, in order (fit + function before loads): (1) Rev-A fit intact · (2) install + removal practical with retention · (3) retention does **not** clamp (still a slip) · (4) skeleton attachment rigid · (5) wheel + tool clearance survive · (6) no load reaches the encoder cap. Structural vectors (§6) run after these pass.
 
 ## 9. Open decisions / next
 
-- **Retention approach (§2)** — Darrell ratifies A/C vs B.
-- **Skeleton interface values (§4)** — forward-dependent on the bottom plate; parameterize now, fix when the plate exists.
-- **`F_lat` and stall-torque targets (§6)** — set once rover mass is estimated and #4885 stall torque is pulled.
-- On ratification → Claude writes the **Pass-2 CAD recipe + prototype**, traceable to this committed spec.
+- **Retention** (§2) — selected A/C by Q + Claude; **Darrell ratifies.**
+- **Alignment method** (§4b) — indexed/shim vs locked slot.
+- **Skeleton-interface values** (§4a) — forward-dependent on the bottom plate.
+- **`F_lat`, torque target, safety factor, cycle count** (§6) — set once rover mass estimated + #4885 stall torque pulled.
+- On amendments committed + retention ratified → Claude writes the **Pass-2 CAD recipe + prototype**, traceable to this commit.
 
-*Face locates, body catches, retention holds, skeleton carries — encoder stays free. Fit is proven; strength is the next thing we earn, not assume.*
+*Face locates, body catches, strap holds (without squeezing), skeleton carries — encoder stays free. Fit is proven; strength is earned on a fixture, then re-earned on the real chassis.*
 
-*Cycle: Claude draft → Q audit (folded) → Darrell ratify → commit → recipe.*
+*Cycle: Claude draft → Q audit ×2 (folded) → Darrell ratify → commit → recipe.*
