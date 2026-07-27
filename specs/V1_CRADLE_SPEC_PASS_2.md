@@ -18,7 +18,7 @@
 
 Carried forward unchanged: 2× **M3×8** face screws (~4 mm engagement, **≤6 mm intrusion**), **open encoder tail** (~14.5 cap + connector + wire bend), **wheel envelope** (Ø80.30 + 8.78 tire + margin), **molded L/R + asymmetric keying**. Validated Rev-A slip params (evidence for the QIDI X-Plus 4 / PLA Rapido / 0.20 Standard profile): `C_cup` 0.35 diametral (ID 25.14), `C_hole` 3.4, boss pocket 7.73 × 2.82, `T_plate` 4.0, saddle arc **180°**, `saddle_len` 22.
 
-## 2. Retention — SELECTED: 180° saddle + compression-limited strap (Q + Claude agree; Darrell ratifies)
+## 2. Retention — RATIFIED: 180° saddle + compression-limited strap (Q + Claude recommended; **Darrell ratified 2026-07-26**)
 
 Keep the verified 180° saddle **exactly** and add a **removable upper strap/cap** as separate retention. (Option B, over-center capture, rejected: changes validated cup geometry, introduces uncontrolled clamping, depends on orientation + fatigue, complicates removal, forces the fit gate to repeat across the whole interface.)
 
@@ -77,7 +77,7 @@ Confirm, in order (fit + function before loads): (1) Rev-A fit intact · (2) ins
 
 ## 9. Open decisions / next
 
-- **Retention** (§2) — selected A/C by Q + Claude; **Darrell ratifies.**
+- **Retention** (§2) — **RATIFIED** by Darrell (2026-07-26): 180° verified saddle + compression-limited strap.
 - **Alignment method** (§4b) — indexed/shim vs locked slot.
 - **Skeleton-interface values** (§4a) — forward-dependent on the bottom plate.
 - **`F_lat`, torque target, safety factor, cycle count** (§6) — set once rover mass estimated + #4885 stall torque pulled.
